@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>数学 AI 助教</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <h2>🎓 数学 AI 助教</h2>
+
+  <label>教学模式：</label>
+  <select id="level">
+    <option value="hint">只给提示</option>
+    <option value="step" selected>分步讲解</option>
+    <option value="full">完整讲解</option>
+  </select>
+
+  <br /><br />
+
+  <textarea id="input" rows="4" style="width:100%;" placeholder="请输入数学问题..."></textarea>
+  <br />
+  <button id="send">发送</button>
+
+  <div id="output" style="margin-top:20px;"></div>
+
+  <script>
+    document.getElementById("send").onclick = async () => {
+      const content = input.value.trim();
+      if (!content) return;
+
+      output.innerHTML = "思考中…";
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: content,
+          level: document.getElementById("level").value
+        })
+      });
+
+      const data = await res.json();
+      output.innerHTML = data.reply || data.error;
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([output]);
+      }
+    };
+  </script>
+</body>
+</html>
